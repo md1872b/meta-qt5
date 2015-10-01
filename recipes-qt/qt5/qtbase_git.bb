@@ -13,13 +13,13 @@ LIC_FILES_CHKSUM = " \
 # common for qtbase-native, qtbase-nativesdk and qtbase
 SRC_URI += "\
     file://0001-Add-linux-oe-g-platform.patch \
-    file://0002-qlibraryinfo-allow-to-set-qt.conf-from-the-outside-u.patch \
-    file://0003-Add-external-hostbindir-option.patch \
+    file://0001-Add-win32-g-oe-mkspec-that-uses-the-OE_-environment.patch \
+    file://0001-QMake-Add-option-to-set-qt.conf-file.patch \
     file://0004-qt_module-Fix-pkgconfig-and-libtool-replacements.patch \
     file://0005-configure-bump-path-length-from-256-to-512-character.patch \
     file://0006-QOpenGLPaintDevice-sub-area-support.patch \
     file://0007-linux-oe-g-Invert-conditional-for-defining-QT_SOCKLE.patch \
-    file://0008-configure-paths-for-target-qmake-properly.patch \
+    file://0002-configure-Separate-host-and-build-platform.patch \
 "
 
 DEPENDS += "qtbase-native"
@@ -139,20 +139,19 @@ QT_CONFIG_FLAGS += " \
     ${EXTRA_OECONF} \
 "
 
-do_generate_qt_config_file_append() {
-    cat >> ${QT_CONF_PATH} <<EOF
+OE_QMAKE_PATH_HOST_BINS = "${OE_QMAKE_PATH_EXTERNAL_HOST_BINS}"
 
+generate_qt_config_file_effective_paths() {
+    cat >> ${OE_QMAKE_QTCONF_PATH} <<EOF
 [EffectivePaths]
-Prefix=..
+Prefix=${B}
 EOF
 }
 
+OE_QMAKE_PATH_HOST_DATA = "${STAGING_LIBDIR}${QT_DIR_NAME}"
 # qtbase is exception, we need to use mkspecs from ${S}
-QMAKE_MKSPEC_PATH = "${B}"
-
-# another exception is that we need to run bin/qmake, because EffectivePaths are relative to qmake location
-OE_QMAKE_QMAKE_ORIG = "${STAGING_BINDIR_NATIVE}${QT_DIR_NAME}/qmake"
-OE_QMAKE_QMAKE = "bin/qmake"
+QMAKE_MKSPEC_PATH_TARGET = "${B}"
+QMAKE_MKSPEC_PATH = "${S}"
 
 # qtbase is exception, configure script is using our get(X)QEvalMakeConf and setBootstrapEvalVariable functions to read it from shell
 export OE_QMAKE_COMPILER
@@ -166,17 +165,9 @@ export OE_QMAKE_AR
 export OE_QMAKE_STRIP
 
 do_configure() {
-    # we need symlink in path relative to source, because
-    # EffectivePaths:Prefix is relative to qmake location
-    if [ ! -e ${B}/bin/qmake ]; then
-        mkdir -p ${B}/bin
-        ln -sf ${OE_QMAKE_QMAKE_ORIG} ${B}/bin/qmake
-    fi
-
     ${S}/configure -v \
         -opensource -confirm-license \
         -sysroot ${STAGING_DIR_TARGET} \
-        -no-gcc-sysroot \
         -prefix ${OE_QMAKE_PATH_PREFIX} \
         -bindir ${OE_QMAKE_PATH_BINS} \
         -libdir ${OE_QMAKE_PATH_LIBS} \
@@ -195,7 +186,7 @@ do_configure() {
         -hostbindir ${OE_QMAKE_PATH_HOST_BINS} \
         -external-hostbindir ${OE_QMAKE_PATH_EXTERNAL_HOST_BINS} \
         -hostdatadir ${OE_QMAKE_PATH_HOST_DATA} \
-        -platform ${OE_QMAKESPEC} \
+        -platform ${OE_QMAKE_PLATFORM_NATIVE} \
         -xplatform linux-oe-g++ \
         ${QT_CONFIG_FLAGS}
 
@@ -203,8 +194,6 @@ do_configure() {
 }
 
 do_install_append() {
-    install -m 0755 ${B}/bin/qmake-target ${D}/${bindir}${QT_DIR_NAME}/qmake
-
     ### Fix up the binaries to the right location
     ### TODO: FIX
     # install fonts manually if they are missing
@@ -222,9 +211,9 @@ do_install_append() {
     rm -rf ${D}/${OE_QMAKE_PATH_QT_ARCHDATA}/mkspecs/macx-ios-clang
 
     # Replace host paths with qmake built-in properties
-#    sed -i -e 's| ${STAGING_DIR_NATIVE}${prefix_native}| $$[QT_HOST_PREFIX]|g' \
-#        -e 's| ${STAGING_DIR_HOST}| $$[QT_SYSROOT]|g' \
-#        ${D}/${OE_QMAKE_PATH_QT_ARCHDATA}/mkspecs/qconfig.pri
+    sed -i -e 's|${STAGING_DIR_NATIVE}${prefix_native}|$$[QT_HOST_PREFIX/get]|g' \
+        -e 's|${STAGING_DIR_HOST}|$$[QT_SYSROOT]|g' \
+        ${D}/${OE_QMAKE_PATH_QT_ARCHDATA}/mkspecs/*.pri
 }
 
 PACKAGES =. " \

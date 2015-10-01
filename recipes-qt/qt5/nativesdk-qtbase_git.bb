@@ -1,5 +1,6 @@
 DESCRIPTION = "SDK version of Qt/[X11|Mac|Embedded]"
 DEPENDS = "nativesdk-zlib nativesdk-dbus qtbase-native"
+DEPENDS_remove_mingw32 = "nativesdk-dbus"
 SECTION = "libs"
 HOMEPAGE = "http://qt-project.org"
 
@@ -23,18 +24,18 @@ FILESEXTRAPATHS =. "${FILE_DIRNAME}/qtbase:"
 # common for qtbase-native, qtbase-nativesdk and qtbase
 SRC_URI += "\
     file://0001-Add-linux-oe-g-platform.patch \
-    file://0002-qlibraryinfo-allow-to-set-qt.conf-from-the-outside-u.patch \
-    file://0003-Add-external-hostbindir-option.patch \
+    file://0001-Add-win32-g-oe-mkspec-that-uses-the-OE_-environment.patch \
     file://0004-qt_module-Fix-pkgconfig-and-libtool-replacements.patch \
     file://0005-configure-bump-path-length-from-256-to-512-character.patch \
     file://0006-QOpenGLPaintDevice-sub-area-support.patch \
     file://0007-linux-oe-g-Invert-conditional-for-defining-QT_SOCKLE.patch \
+    file://0002-configure-Separate-host-and-build-platform.patch \
 "
 
 # common for qtbase-native and nativesdk-qtbase
 SRC_URI += " \
     file://0009-Always-build-uic.patch \
-    file://0010-Add-external-hostbindir-option-for-native-sdk.patch \
+    file://0001-QMake-Add-option-to-set-qt.conf-file.patch \
 "
 
 # CMake's toolchain configuration of nativesdk-qtbase
@@ -50,10 +51,11 @@ FILES_${PN}-tools-dev = " \
     ${includedir} \
     ${FILES_SOLIBSDEV} ${libdir}/*.la \
     ${OE_QMAKE_PATH_ARCHDATA}/mkspecs \
+    ${OE_QMAKE_PATH_LIBS}/*.prl \
 "
 
 FILES_${PN}-tools-staticdev = " \
-    ${libdir}/libQt5Bootstrap.a \
+    ${OE_QMAKE_PATH_LIBS}/*.a \
 "
 
 FILES_${PN}-tools-dbg = " \
@@ -88,7 +90,7 @@ OE_QMAKE_PATH_HOST_DATA = "${libdir}${QT_DIR_NAME}"
 OE_QMAKE_PATH_HOST_LIBS = "${libdir}"
 
 do_generate_qt_config_file() {
-    cat > ${QT_CONF_PATH} <<EOF
+    cat > ${OE_QMAKE_QTCONF_PATH} <<EOF
 [Paths]
 Prefix = ${OE_QMAKE_PATH_PREFIX}
 Headers = ${OE_QMAKE_PATH_HEADERS}
@@ -108,18 +110,18 @@ Tests = ${OE_QMAKE_PATH_TESTS}
 HostBinaries = ${OE_QMAKE_PATH_HOST_BINS}
 HostData = ${OE_QMAKE_PATH_HOST_DATA}
 HostLibraries = ${OE_QMAKE_PATH_HOST_LIBS}
-HostSpec = ${OE_QMAKESPEC}
-TartgetSpec = ${OE_XQMAKESPEC}
+HostSpec = ${OE_QMAKE_PLATFORM_NATIVE}
+TargetSpec = ${OE_QMAKE_PLATFORM}
 ExternalHostBinaries = ${OE_QMAKE_PATH_EXTERNAL_HOST_BINS}
 Sysroot =
 EOF
 }
 
 do_generate_qt_config_file_append() {
-    cat >> ${QT_CONF_PATH} <<EOF
+    cat >> ${OE_QMAKE_QTCONF_PATH} <<EOF
 
 [EffectivePaths]
-Prefix=..
+Prefix=${B}
 EOF
 }
 
@@ -137,21 +139,10 @@ export OE_QMAKE_LDFLAGS
 export OE_QMAKE_AR
 export OE_QMAKE_STRIP
 
-# another exception is that we need to run bin/qmake, because EffectivePaths are relative to qmake location
-OE_QMAKE_QMAKE_ORIG = "${STAGING_BINDIR_NATIVE}${QT_DIR_NAME}/qmake"
-OE_QMAKE_QMAKE = "bin/qmake"
-
 do_configure() {
-    # we need symlink in path relative to source, because
-    # EffectivePaths:Prefix is relative to qmake location
-    if [ ! -e ${B}/bin/qmake ]; then
-        mkdir -p ${B}/bin
-        ln -sf ${OE_QMAKE_QMAKE_ORIG} ${B}/bin/qmake
-    fi
-
     ${S}/configure -v \
         -opensource -confirm-license \
-        -sysroot ${STAGING_DIR_NATIVE} \
+        -sysroot ${STAGING_DIR_TARGET} \
         -no-gcc-sysroot \
         -system-zlib \
         -no-libjpeg \
@@ -185,6 +176,7 @@ do_configure() {
         -testsdir ${OE_QMAKE_PATH_TESTS} \
         -hostbindir ${OE_QMAKE_PATH_HOST_BINS} \
         -hostdatadir ${OE_QMAKE_PATH_HOST_DATA} \
+        -host-option CROSS_COMPILE=${HOST_PREFIX} \
         -external-hostbindir ${OE_QMAKE_PATH_EXTERNAL_HOST_BINS} \
         -no-glib \
         -no-iconv \
@@ -194,20 +186,24 @@ do_configure() {
         -nomake libs \
         -no-compile-examples \
         -no-rpath \
-        -platform ${OE_QMAKESPEC} \
-        -xplatform linux-oe-g++ \
+        -platform ${OE_QMAKE_PLATFORM_NATIVE} \
+        -xplatform ${OE_QMAKE_PLATFORM} \
         ${QT_CONFIG_FLAGS}
 
-    bin/qmake ${OE_QMAKE_DEBUG_OUTPUT} ${S} -o Makefile || die "Configuring qt with qmake failed. EXTRA_OECONF was ${EXTRA_OECONF}"
+    ${OE_QMAKE_QMAKE} ${OE_QMAKE_DEBUG_OUTPUT} ${OE_QMAKE_QTCONF} ${S} -o Makefile || die "Configuring qt with qmake failed. EXTRA_OECONF was ${EXTRA_OECONF}"
 }
 
 # Set the EXTRA_QTLIB variable to e.g. Xml, in order to not remove libQt5Xml.so.*
-EXTRA_QTLIB ?= ""
+EXTRA_QTLIB = "Core"
+
+PRESERVE_PATTERN = "libQt5%s.so*"
+PRESERVE_PATTERN_mingw32 = "libQt5%s.a"
 
 python __anonymous () {
     templibs = ""
+    preservepattern = d.getVar("PRESERVE_PATTERN", True)
     for e in d.getVar("EXTRA_QTLIB", True).split():
-        templibs = "%s -not -name 'libQt5%s.so*' -and" % (templibs, e)
+        templibs = ("%s -not -name '" + preservepattern + "' -and") % (templibs, e)
     d.setVar("QTLIBSPRESERVE", templibs)
 }
 
@@ -217,12 +213,6 @@ do_install() {
 
     oe_runmake install INSTALL_ROOT=${D}
 
-    install -m 755 ${B}/bin/qmake-target ${D}${OE_QMAKE_PATH_HOST_BINS}/qmake
-
-    # for modules which are still using syncqt and call qtPrepareTool(QMAKE_SYNCQT, syncqt)
-    # e.g. qt3d, qtwayland
-    ln -sf syncqt.pl ${D}${OE_QMAKE_PATH_QT_BINS}/syncqt
-
     # remove things unused in nativesdk, we need the headers, Qt5Core
     # and Qt5Bootstrap.
     rm -rf ${D}${datadir} \
@@ -230,7 +220,6 @@ do_install() {
            ${D}${libdir}/cmake \
            ${D}${libdir}/pkgconfig
     find ${D}${libdir} -maxdepth 1 -name 'lib*' -and -not -type d -and \
-                                   -not -name 'libQt5Core.so*' -and \
                                    ${QTLIBSPRESERVE} \
                                    -not -name 'libQt5Bootstrap.a' \
                                    -exec rm '{}' ';'
@@ -252,7 +241,6 @@ fakeroot do_generate_qt_environment_file() {
     echo 'export OE_QMAKE_CXX=$CXX' >> $script
     echo 'export OE_QMAKE_LINK=$CXX' >> $script
     echo 'export OE_QMAKE_AR=$AR' >> $script
-    echo 'export QT_CONF_PATH=${OE_QMAKE_PATH_HOST_BINS}/qt.conf' >> $script
     echo 'export OE_QMAKE_LIBDIR_QT=`qmake -query QT_INSTALL_LIBS`' >> $script
     echo 'export OE_QMAKE_INCDIR_QT=`qmake -query QT_INSTALL_HEADERS`' >> $script
     echo 'export OE_QMAKE_MOC=${OE_QMAKE_PATH_HOST_BINS}/moc' >> $script
@@ -266,6 +254,9 @@ fakeroot do_generate_qt_environment_file() {
 
     # Use relocable sysroot
     sed -i -e 's:${SDKPATHNATIVE}:$OECORE_NATIVE_SYSROOT:g' $script
+}
+
+fakeroot do_generate_qt_environment_file_mingw32() {
 }
 
 addtask generate_qt_environment_file after do_install before do_package

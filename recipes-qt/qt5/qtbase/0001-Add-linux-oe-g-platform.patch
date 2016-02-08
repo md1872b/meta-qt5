@@ -37,10 +37,6 @@ Subject: [PATCH 1/9] Add linux-oe-g++ platform
     /bin/sh: line 0: test: -gt: unary operator expected
     which are not fatal, but still misleading in do_configure output
 
-* add -target suffix to qmake built in qtbase configure, this way we can
-  use qmake from qtbase-native, but then include qmake built for target
-  in qtbase-tools package (smilarly for nativesdk-qtbase).
-
 Upstream-Status: Inappropriate [embedded specific]
                  too OE specific, probably cannot be upstreamed
 
@@ -184,7 +180,7 @@ index 16e8fb4..9897fe6 100755
                          \"\$(SOURCE_PATH)/src/corelib/io/qfsfileengine_unix.cpp\" \
                          \"\$(SOURCE_PATH)/src/corelib/tools/qlocale_unix.cpp\""
              EXEEXT=
-+            [ "$QT_CROSS_COMPILE" = "yes" ] && EXEEXT=-target
++
          fi
          if [ "$BUILD_ON_MAC" = "yes" ]; then
              echo "COCOA_LFLAGS =-framework Foundation -framework CoreServices" >>"$mkfile"

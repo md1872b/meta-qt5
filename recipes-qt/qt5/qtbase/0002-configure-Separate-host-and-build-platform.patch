@@ -254,7 +254,7 @@ index 52c1be2..6b89d34 100755
 @@ -4068,7 +4103,8 @@ \"\$(SOURCE_PATH)/src/corelib/io/qfsfileengine_unix.cpp\"
                          \"\$(SOURCE_PATH)/src/corelib/tools/qlocale_unix.cpp\""
              EXEEXT=
-             [ "$QT_CROSS_COMPILE" = "yes" ] && EXEEXT=-target
+
 -        fi
 +            ;;
 +        esac

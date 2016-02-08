@@ -21,6 +21,7 @@ PACKAGES =. " \
     ${PN}-qtlocation \
     ${PN}-qtdeclarative \
     ${PN}-qtquickcontrols \
+    ${PN}-qtquickcontrols2 \
     ${PN}-qtwebsockets \
     ${PN}-qtxmlpatterns \
     ${PN}-qtconfig \
@@ -68,6 +69,10 @@ FILES_${PN}-qtquickcontrols = " \
     ${OE_QMAKE_PATH_TRANSLATIONS}/qtquickcontrols_*.qm \
 "
 
+FILES_${PN}-qtquickcontrols2 = " \
+    ${OE_QMAKE_PATH_TRANSLATIONS}/qtquickcontrols2_*.qm \
+"
+
 FILES_${PN}-qtwebsockets = " \
     ${OE_QMAKE_PATH_TRANSLATIONS}/qtwebsockets_*.qm \
 "
@@ -104,4 +109,4 @@ FILES_${PN}-qt = " \
     ${OE_QMAKE_PATH_TRANSLATIONS}/qt_*.qm \
 "
 
-SRCREV = "9c6d1af76ac28de8d59be344ea3a21b2607fa118"
+SRCREV = "41d212290c3822b8eef151785d89ac5f5b246bde"

@@ -1,4 +1,4 @@
-From 89784751fa045f0bf86bc87b9be4dd5b19e1227d Mon Sep 17 00:00:00 2001
+From 4a99cb44a7913ff86e644dc08578e579958983a4 Mon Sep 17 00:00:00 2001
 From: David Schulz <david.schulz@theqtcompany.com>
 Date: Mon, 12 Oct 2015 09:55:30 +0200
 Subject: [PATCH] configure: Separate host and build platform.
@@ -17,7 +17,7 @@ Change-Id: Ifd83a4c6376d3299647e74bb349a3452a6f433fc
  config.tests/unix/compile.test     |   6 +-
  configure                          | 163 ++++++++++++++++++++++++++++++++-----
  mkspecs/features/device_config.prf |  15 ++--
- mkspecs/features/qt_functions.prf  | 2 +-
+ mkspecs/features/qt_functions.prf  |   2 +-
  mkspecs/features/qt_tool.prf       |  57 ++++++++-----
  qmake/qmake-aux.pro                |  11 +++
  qmake/qmake-docs.pro               |   2 -
@@ -51,7 +51,7 @@ index c50bd8b..cfb47de 100755
  
  ARCH=""
 diff --git a/config.tests/unix/compile.test b/config.tests/unix/compile.test
-index 103321e..57769a3 100755
+index 65bc874..45c365c 100755
 --- a/config.tests/unix/compile.test
 +++ b/config.tests/unix/compile.test
 @@ -10,7 +10,9 @@ OUTDIR=$5
@@ -69,13 +69,13 @@ index 103321e..57769a3 100755
  # Make sure output from possible previous tests is gone
  rm -f "$EXE" "${EXE}.exe"
  
--set -- "$OUTDIR/bin/qmake" -nocache -spec "$QMKSPEC" "CONFIG+=$QMAKE_CONFIG" "CONFIG+=android_app" "CONFIG-=debug_and_release app_bundle lib_bundle" "LIBS*=$LFLAGS" "LIBS+=$MAC_ARCH_LFLAGS" "INCLUDEPATH*=$INCLUDEPATH" "QMAKE_CXXFLAGS*=$CXXFLAGS" "QMAKE_CXXFLAGS+=$MAC_ARCH_CXXFLAGS" "$SRCDIR/$TEST/$EXE.pro" -o "$OUTDIR/$TEST/Makefile"
-+set -- "$QMAKE" -qtconf "$QTCONF" -nocache -spec "$QMKSPEC" "CONFIG+=$QMAKE_CONFIG" "CONFIG+=android_app" "CONFIG-=debug_and_release app_bundle lib_bundle" "LIBS*=$LFLAGS" "LIBS+=$MAC_ARCH_LFLAGS" "INCLUDEPATH*=$INCLUDEPATH" "QMAKE_CXXFLAGS*=$CXXFLAGS" "QMAKE_CXXFLAGS+=$MAC_ARCH_CXXFLAGS" "$SRCDIR/$TEST/$EXE.pro" -o "$OUTDIR/$TEST/Makefile"
+-set -- "$OUTDIR/bin/qmake" -nocache -spec "$QMKSPEC" "CONFIG+=$QMAKE_CONFIG" "CONFIG+=android_app" "CONFIG-=debug_and_release app_bundle lib_bundle" "LIBS+=$LFLAGS" "LIBS+=$MAC_ARCH_LFLAGS" "INCLUDEPATH*=$INCLUDEPATH" "QMAKE_CXXFLAGS*=$CXXFLAGS" "QMAKE_CXXFLAGS+=$MAC_ARCH_CXXFLAGS" "$SRCDIR/$TEST/$EXE.pro" -o "$OUTDIR/$TEST/Makefile"
++set -- "$QMAKE" -qtconf "$QTCONF" -nocache -spec "$QMKSPEC" "CONFIG+=$QMAKE_CONFIG" "CONFIG+=android_app" "CONFIG-=debug_and_release app_bundle lib_bundle" "LIBS+=$LFLAGS" "LIBS+=$MAC_ARCH_LFLAGS" "INCLUDEPATH*=$INCLUDEPATH" "QMAKE_CXXFLAGS*=$CXXFLAGS" "QMAKE_CXXFLAGS+=$MAC_ARCH_CXXFLAGS" "$SRCDIR/$TEST/$EXE.pro" -o "$OUTDIR/$TEST/Makefile"
  if [ "$VERBOSE" = "yes" ]; then
      OUTDIR=$OUTDIR "$@" && $MAKE && SUCCESS=yes
  else
 diff --git a/configure b/configure
-index 52c1be2..6b89d34 100755
+index d923bbb..175eb02 100755
 --- a/configure
 +++ b/configure
 @@ -104,9 +104,11 @@ QT_CONFIG=
@@ -118,7 +118,7 @@ index 52c1be2..6b89d34 100755
          if [ "$BUILD_ON_MAC" = "yes" ]; then specvals=$(macSDKify "$specvals"); fi
      fi
      getSingleQMakeVariable "$1" "$specvals"
-@@ -345,7 +347,7 @@ getQMakeConf()
+@@ -355,7 +357,7 @@ getQEvalMakeConf()
  getXQMakeConf()
  {
      if [ -z "$xspecvals" ]; then
@@ -127,7 +127,7 @@ index 52c1be2..6b89d34 100755
          if [ "$XPLATFORM_MAC" = "yes" ]; then xspecvals=$(macSDKify "$xspecvals"); fi
      fi
      getSingleQMakeVariable "$1" "$xspecvals"
-@@ -478,6 +480,23 @@ resolveDeviceMkspec()
+@@ -498,6 +500,23 @@ resolveDeviceMkspec()
  }
  
  #-------------------------------------------------------------------------------
@@ -151,7 +151,7 @@ index 52c1be2..6b89d34 100755
  # operating system detection
  #-------------------------------------------------------------------------------
  
-@@ -502,12 +521,10 @@ BUILD_ON_MAC=no
+@@ -522,12 +541,10 @@ BUILD_ON_MAC=no
  if [ -d /System/Library/Frameworks/Carbon.framework ]; then
      BUILD_ON_MAC=yes
  fi
@@ -164,7 +164,7 @@ index 52c1be2..6b89d34 100755
      DEV_NULL=/tmp/empty-file
      echo "" > $DEV_NULL
      relpath=`(cd "$relpath"; pwd -W)`
-@@ -922,6 +939,7 @@ while [ "$#" -gt 0 ]; do
+@@ -932,6 +949,7 @@ while [ "$#" -gt 0 ]; do
      -hostlibdir| \
      -extprefix| \
      -sysroot| \
@@ -172,7 +172,7 @@ index 52c1be2..6b89d34 100755
      -depths| \
      -make| \
      -nomake| \
-@@ -930,6 +948,7 @@ while [ "$#" -gt 0 ]; do
+@@ -940,6 +958,7 @@ while [ "$#" -gt 0 ]; do
      -xplatform| \
      -device| \
      -device-option| \
@@ -180,7 +180,7 @@ index 52c1be2..6b89d34 100755
      -sdk| \
      -arch| \
      -host-arch| \
-@@ -1249,6 +1268,10 @@ while [ "$#" -gt 0 ]; do
+@@ -1259,6 +1278,10 @@ while [ "$#" -gt 0 ]; do
      gcc-sysroot)
          CFG_GCC_SYSROOT="$VAL"
          ;;
@@ -191,7 +191,7 @@ index 52c1be2..6b89d34 100755
      bindir)
          QT_INSTALL_BINS="$VAL"
          ;;
-@@ -1423,6 +1446,11 @@ while [ "$#" -gt 0 ]; do
+@@ -1433,6 +1456,11 @@ while [ "$#" -gt 0 ]; do
          DEV_VAL=`echo $VAL | cut -d '=' -f 2-`
          DeviceVar set $DEV_VAR "$DEV_VAL"
          ;;
@@ -203,7 +203,7 @@ index 52c1be2..6b89d34 100755
      qpa)
          QT_QPA_DEFAULT_PLATFORM="$VAL"
          ;;
-@@ -2671,6 +2699,8 @@ Additional options:
+@@ -2683,6 +2711,8 @@ Additional options:
      -device-option <key=value> ... Add device specific options for the device mkspec
                                     (experimental)
  
@@ -212,7 +212,7 @@ index 52c1be2..6b89d34 100755
   *  -no-separate-debug-info . Do not store debug information in a separate file.
      -separate-debug-info .... Strip debug information into a separate file.
  
-@@ -2702,6 +2732,9 @@ Additional options:
+@@ -2714,6 +2744,9 @@ Additional options:
      -sysroot <dir> ...... Sets <dir> as the target compiler's and qmake's sysroot and also sets pkg-config paths.
      -no-gcc-sysroot ..... When using -sysroot, it disables the passing of --sysroot to the compiler
  
@@ -222,7 +222,7 @@ index 52c1be2..6b89d34 100755
      -no-feature-<feature> Do not compile in <feature>.
      -feature-<feature> .. Compile in <feature>. The available features
                            are described in src/corelib/global/qfeatures.txt
-@@ -3301,7 +3301,7 @@ if [ -d "$XPLATFORM" ]; then
+@@ -3280,7 +3313,7 @@ if [ -d "$XPLATFORM" ]; then
  else
    XQMAKESPEC="$relpath/mkspecs/${XPLATFORM}"
  fi
@@ -231,7 +231,7 @@ index 52c1be2..6b89d34 100755
      QT_CROSS_COMPILE=yes
      QMAKE_CONFIG="$QMAKE_CONFIG cross_compile"
      QTCONFIG_CONFIG="$QTCONFIG_CONFIG cross_compile"
-@@ -4039,7 +4072,8 @@ if true; then ###[ '!' -f "$outpath/bin/qmake" ];
+@@ -4059,7 +4092,8 @@ if true; then ###[ '!' -f "$outpath/bin/qmake" ];
                  EXTRA_LFLAGS="\$(QMAKE_LFLAGS_RPATH)\"$rpath\" $EXTRA_LFLAGS"
              done
          fi
@@ -241,7 +241,7 @@ index 52c1be2..6b89d34 100755
              EXTRA_CFLAGS="-DUNICODE"
              EXTRA_CXXFLAGS="-DUNICODE"
              EXTRA_OBJS="qfilesystemengine_win.o \
-@@ -4058,7 +4092,8 @@ if true; then ###[ '!' -f "$outpath/bin/qmake" ];
+@@ -4078,7 +4112,8 @@ if true; then ###[ '!' -f "$outpath/bin/qmake" ];
                          \"\$(SOURCE_PATH)/tools/shared/windows/registry.cpp\""
              EXTRA_LFLAGS="-static -s -lole32 -luuid -ladvapi32 -lkernel32"
              EXEEXT=".exe"
@@ -269,7 +269,7 @@ index 52c1be2..6b89d34 100755
          echo >>"$mkfile"
  	adjrelpath=`echo "$relpath" | sed 's/ /\\\\\\\\ /g'`
  	adjoutpath=`echo "$outpath" | sed 's/ /\\\\\\\\ /g'`
-@@ -4158,7 +4195,81 @@ QTCONFFILE="$outpath/bin/qt.conf"
+@@ -4178,7 +4215,81 @@ QTCONFFILE="$outpath/bin/qt.conf"
  cat > "$QTCONFFILE" <<EOF
  [EffectivePaths]
  Prefix=..
@@ -351,7 +351,7 @@ index 52c1be2..6b89d34 100755
  if [ x"$relpath" != x"$outpath" ]; then
      cat >> "$QTCONFFILE" <<EOF
  [EffectiveSourcePaths]
-@@ -4166,6 +4277,9 @@ Prefix=$relpath
+@@ -4186,6 +4297,9 @@ Prefix=$relpath
  EOF
  fi
  
@@ -361,7 +361,7 @@ index 52c1be2..6b89d34 100755
  #-------------------------------------------------------------------------------
  # write out device config before we run the test.
  #-------------------------------------------------------------------------------
-@@ -4178,9 +4292,20 @@ else
+@@ -4198,9 +4312,20 @@ else
  fi
  
  #-------------------------------------------------------------------------------
@@ -383,7 +383,7 @@ index 52c1be2..6b89d34 100755
  if [ $? != "0" ]; then
      echo "Failed to process makespec for platform '$XPLATFORM'"
      if [ "$OPT_VERBOSE" = "yes" ]; then
-@@ -4196,7 +4321,7 @@ fi
+@@ -4216,7 +4341,7 @@ fi
  #-------------------------------------------------------------------------------
  if [ -z "$PKG_CONFIG" ]; then
      # See if PKG_CONFIG is set in the mkspec:
@@ -392,7 +392,7 @@ index 52c1be2..6b89d34 100755
      [ -n "$PKG_CONFIG" ] && [ "$OPT_VERBOSE" = "yes" ] && echo "Found pkg-config from mkspec: $PKG_CONFIG"
  fi
  if [ -z "$PKG_CONFIG" ]; then
-@@ -4271,7 +4396,7 @@ compileTest()
+@@ -4291,7 +4416,7 @@ compileTest()
      if [ "$CFG_SHARED" = "no" ]; then
          test_config="$QMAKE_CONFIG static"
      fi
@@ -401,7 +401,7 @@ index 52c1be2..6b89d34 100755
  }
  
  compileTestWithPkgConfig()
-@@ -4320,7 +4445,7 @@ compileTestWithPkgConfig()
+@@ -4340,7 +4465,7 @@ compileTestWithPkgConfig()
  
  # Use config.tests/arch/arch.pro to have the compiler tell us what the target architecture is
  OUTFILE=$outpath/arch.result
@@ -410,7 +410,7 @@ index 52c1be2..6b89d34 100755
  if [ $? -eq 0 ]; then
      eval `cat "$OUTFILE"`
  else
-@@ -4333,7 +4458,7 @@ rm -f "$OUTFILE" 2>/dev/null
+@@ -4353,7 +4478,7 @@ rm -f "$OUTFILE" 2>/dev/null
  
  if [ "$QMAKESPEC" != "$XQMAKESPEC" ]; then
      # Do the same test again, using the host compiler
@@ -419,7 +419,7 @@ index 52c1be2..6b89d34 100755
      if [ $? -eq 0 ]; then
          eval `cat "$OUTFILE"`
      else
-@@ -4549,7 +4674,7 @@ fi
+@@ -4569,7 +4694,7 @@ fi
  
  # detect mips_dsp support
  if [ "$CFG_ARCH" = "mips" ] && [ "${CFG_MIPS_DSP}" = "auto" ]; then
@@ -428,7 +428,7 @@ index 52c1be2..6b89d34 100755
          CFG_MIPS_DSP=yes
      else
          CFG_MIPS_DSP=no
-@@ -4560,7 +4685,7 @@ fi
+@@ -4580,7 +4705,7 @@ fi
  
  # detect mips_dspr2 support
  if [ "$CFG_ARCH" = "mips" ] && [ "${CFG_MIPS_DSPR2}" = "auto" ]; then
@@ -437,7 +437,7 @@ index 52c1be2..6b89d34 100755
          CFG_MIPS_DSPR2=yes
      else
          CFG_MIPS_DSPR2=no
-@@ -7447,7 +7572,7 @@ rm -f "$QMAKE_VARS_FILE" 2>/dev/null
+@@ -7467,7 +7592,7 @@ rm -f "$QMAKE_VARS_FILE" 2>/dev/null
          cd ..
      fi
  
@@ -475,7 +475,7 @@ index e0383ef..9281d3e 100644
  # Provide a function to be used by mkspecs
  defineTest(deviceSanityCheckCompiler) {
 diff --git a/mkspecs/features/qt_functions.prf b/mkspecs/features/qt_functions.prf
-index 00f4bdf..6615995 100644
+index b2c2507..c16005f 100644
 --- a/mkspecs/features/qt_functions.prf
 +++ b/mkspecs/features/qt_functions.prf
 @@ -57,7 +57,7 @@ defineTest(qtHaveModule) {
@@ -488,7 +488,7 @@ index 00f4bdf..6615995 100644
              cmd = perl -w $$system_path($${cmd}.pl)
          } else: contains(QMAKE_HOST.os, Windows) {
 diff --git a/mkspecs/features/qt_tool.prf b/mkspecs/features/qt_tool.prf
-index 3f0301a..add121d 100644
+index 839c3d6..45f1b94 100644
 --- a/mkspecs/features/qt_tool.prf
 +++ b/mkspecs/features/qt_tool.prf
 @@ -17,39 +17,52 @@ DEFINES *= QT_USE_QSTRINGBUILDER
@@ -639,5 +639,5 @@ index 98ca86a..11cff9e 100644
  mkspecs.files -= $$PWD/mkspecs/modules $$PWD/mkspecs/modules-inst
  INSTALLS += mkspecs
 -- 
-2.5.0.windows.1
+1.9.1
 

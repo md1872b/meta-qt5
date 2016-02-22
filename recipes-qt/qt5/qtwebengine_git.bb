@@ -92,6 +92,7 @@ do_configure() {
 
 do_install_append() {
     rmdir ${D}${OE_QMAKE_PATH_PLUGINS}/${BPN} ${D}${OE_QMAKE_PATH_PLUGINS} || true
+    sed -i 's@ -Wl,--start-group.*-Wl,--end-group@@g; s@-L${B}[^ ]* @ @g' ${D}${libdir}/pkgconfig/Qt5WebEngineCore.pc
 }
 PACKAGE_DEBUG_SPLIT_STYLE = "debug-without-src"
 
@@ -110,10 +111,10 @@ SRC_URI += " \
     ${QT_GIT}/qtwebengine-chromium.git;name=chromium;branch=${QT_MODULE_BRANCH_CHROMIUM};destsuffix=git/src/3rdparty \
     file://0001-functions.prf-Don-t-match-QMAKE_EXT_CPP-or-QMAKE_EXT.patch \
     file://0002-functions.prf-Make-sure-we-only-use-the-file-name-to.patch \
+    file://0004-WebEngine-qquickwebengineview_p_p.h-add-include-QCol.patch \
+    file://0005-Include-dependency-to-QCoreApplication-translate.patch \
     file://0001-chromium-base.gypi-include-atomicops_internals_x86_g.patch \
-    file://0002-media_capture_devices_dispatcher.h-Include-QCoreApplication-translate.patch \
-    file://0003-WebEngine-qquickwebengineview_p_p.h-add-inc-QColor.patch \
-    file://0001-chromium-jpeg_codec.cc_Change-false-to-FALSE-and-1-to-TRUE.patch \
+    file://0002-chromium-Change-false-to-FALSE-and-1-to-TRUE-FIX-qtw.patch \
 "
 
 SRCREV_qtwebengine = "87cc80fd8182b24ff42f0f5458cb82f139730536"
@@ -123,3 +124,6 @@ SRCREV = "${SRCREV_qtwebengine}"
 SRCREV_FORMAT = "qtwebengine_chromium"
 
 S = "${WORKDIR}/git"
+
+# WARNING: qtwebengine-5.5.99+5.6.0-rc+gitAUTOINC+3f02c25de4_779a2388fc-r0 do_package_qa: QA Issue: ELF binary '/OE/build/oe-core/tmp-glibc/work/i586-oe-linux/qtwebengine/5.5.99+5.6.0-rc+gitAUTOINC+3f02c25de4_779a2388fc-r0/packages-split/qtwebengine/usr/lib/libQt5WebEngineCore.so.5.6.0' has relocations in .text [textrel]
+INSANE_SKIP_${PN} += "textrel"

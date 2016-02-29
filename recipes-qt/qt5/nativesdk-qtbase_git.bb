@@ -1,6 +1,5 @@
 DESCRIPTION = "SDK version of Qt/[X11|Mac|Embedded]"
-DEPENDS = "nativesdk-zlib nativesdk-dbus qtbase-native"
-DEPENDS_remove_mingw32 = "nativesdk-dbus"
+DEPENDS = "nativesdk-zlib qtbase-native"
 SECTION = "libs"
 HOMEPAGE = "http://qt-project.org"
 
@@ -146,6 +145,7 @@ do_configure() {
         -sysroot ${STAGING_DIR_TARGET} \
         -no-gcc-sysroot \
         -system-zlib \
+        -dbus-runtime \
         -no-libjpeg \
         -no-libpng \
         -no-gif \
@@ -243,4 +243,4 @@ fakeroot do_generate_qt_environment_file_mingw32() {
 
 addtask generate_qt_environment_file after do_install before do_package
 
-SRCREV = "8c2b4266002736da499d169a0da187e5cdc5381a"
+SRCREV = "41706400f605524a5a9953714aa0cfbf811dba7e"

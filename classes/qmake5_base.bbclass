@@ -1,8 +1,6 @@
 # hardcode linux, because that's what 0001-Add-linux-oe-g-platform.patch adds
 OE_QMAKE_PLATFORM_NATIVE = "linux-oe-g++"
 OE_QMAKE_PLATFORM = "linux-oe-g++"
-OE_QMAKE_PLATFORM_NATIVE_mingw32 = "win32-g++-oe"
-OE_QMAKE_PLATFORM_mingw32 = "win32-g++-oe"
 
 # Add -d to show debug output from every qmake call, but it prints *a lot*, better to add it only to debugged recipe
 OE_QMAKE_DEBUG_OUTPUT ?= ""

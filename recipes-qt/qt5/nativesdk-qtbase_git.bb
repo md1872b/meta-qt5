@@ -23,7 +23,6 @@ FILESEXTRAPATHS =. "${FILE_DIRNAME}/qtbase:"
 # common for qtbase-native, qtbase-nativesdk and qtbase
 SRC_URI += "\
     file://0001-Add-linux-oe-g-platform.patch \
-    file://0001-Add-win32-g-oe-mkspec-that-uses-the-OE_-environment.patch \
     file://0004-qt_module-Fix-pkgconfig-and-libtool-replacements.patch \
     file://0005-configure-bump-path-length-from-256-to-512-character.patch \
     file://0006-QOpenGLPaintDevice-sub-area-support.patch \
@@ -236,9 +235,6 @@ fakeroot do_generate_qt_environment_file() {
 
     # Use relocable sysroot
     sed -i -e 's:${SDKPATHNATIVE}:$OECORE_NATIVE_SYSROOT:g' $script
-}
-
-fakeroot do_generate_qt_environment_file_mingw32() {
 }
 
 addtask generate_qt_environment_file after do_install before do_package

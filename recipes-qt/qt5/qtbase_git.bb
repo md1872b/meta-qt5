@@ -13,7 +13,6 @@ LIC_FILES_CHKSUM = " \
 # common for qtbase-native, qtbase-nativesdk and qtbase
 SRC_URI += "\
     file://0001-Add-linux-oe-g-platform.patch \
-    file://0001-Add-win32-g-oe-mkspec-that-uses-the-OE_-environment.patch \
     file://0001-QMake-Add-option-to-set-qt.conf-file.patch \
     file://0004-qt_module-Fix-pkgconfig-and-libtool-replacements.patch \
     file://0005-configure-bump-path-length-from-256-to-512-character.patch \

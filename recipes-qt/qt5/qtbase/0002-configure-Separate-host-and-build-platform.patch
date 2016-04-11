@@ -1,4 +1,4 @@
-From 4a99cb44a7913ff86e644dc08578e579958983a4 Mon Sep 17 00:00:00 2001
+From b0e46ec8b5f3a220a1660677c87cefa5fc3a7fc9 Mon Sep 17 00:00:00 2001
 From: David Schulz <david.schulz@theqtcompany.com>
 Date: Mon, 12 Oct 2015 09:55:30 +0200
 Subject: [PATCH] configure: Separate host and build platform.
@@ -15,14 +15,14 @@ Change-Id: Ifd83a4c6376d3299647e74bb349a3452a6f433fc
 ---
  config.tests/unix/arch.test        |   6 +-
  config.tests/unix/compile.test     |   6 +-
- configure                          | 163 ++++++++++++++++++++++++++++++++-----
+ configure                          | 164 ++++++++++++++++++++++++++++++++-----
  mkspecs/features/device_config.prf |  15 ++--
  mkspecs/features/qt_functions.prf  |   2 +-
  mkspecs/features/qt_tool.prf       |  57 ++++++++-----
  qmake/qmake-aux.pro                |  11 +++
  qmake/qmake-docs.pro               |   2 -
  qtbase.pro                         |  15 +---
- 9 files changed, 210 insertions(+), 67 deletions(-)
+ 9 files changed, 210 insertions(+), 68 deletions(-)
  create mode 100644 qmake/qmake-aux.pro
  delete mode 100644 qmake/qmake-docs.pro
 
@@ -75,7 +75,7 @@ index 65bc874..45c365c 100755
      OUTDIR=$OUTDIR "$@" && $MAKE && SUCCESS=yes
  else
 diff --git a/configure b/configure
-index d923bbb..175eb02 100755
+index 42e49c5..a244acb 100755
 --- a/configure
 +++ b/configure
 @@ -104,9 +104,11 @@ QT_CONFIG=
@@ -238,12 +238,12 @@ index d923bbb..175eb02 100755
 -        if [ "$BUILD_ON_MSYS" = "yes" ]; then
 +        case `basename "$PLATFORM"` in
 +        win32-g++*)
-             EXTRA_CFLAGS="-DUNICODE"
-             EXTRA_CXXFLAGS="-DUNICODE"
+             EXTRA_CFLAGS="$EXTRA_CFLAGS -DUNICODE"
+             EXTRA_CXXFLAGS="$EXTRA_CXXFLAGS -DUNICODE"
              EXTRA_OBJS="qfilesystemengine_win.o \
 @@ -4078,7 +4112,8 @@ if true; then ###[ '!' -f "$outpath/bin/qmake" ];
                          \"\$(SOURCE_PATH)/tools/shared/windows/registry.cpp\""
-             EXTRA_LFLAGS="-static -s -lole32 -luuid -ladvapi32 -lkernel32"
+             EXTRA_LFLAGS="$EXTRA_LFLAGS -static -s -lole32 -luuid -ladvapi32 -lkernel32"
              EXEEXT=".exe"
 -        else
 +            ;;
@@ -251,17 +251,18 @@ index d923bbb..175eb02 100755
              EXTRA_OBJS="qfilesystemengine_unix.o \
                          qfilesystemiterator_unix.o \
                          qfsfileengine_unix.o \
-@@ -4068,7 +4103,8 @@ \"\$(SOURCE_PATH)/src/corelib/io/qfsfileengine_unix.cpp\"
+@@ -4088,8 +4123,8 @@ if true; then ###[ '!' -f "$outpath/bin/qmake" ];
+                         \"\$(SOURCE_PATH)/src/corelib/io/qfsfileengine_unix.cpp\" \
                          \"\$(SOURCE_PATH)/src/corelib/tools/qlocale_unix.cpp\""
              EXEEXT=
-
+-
 -        fi
 +            ;;
 +        esac
          if [ "$BUILD_ON_MAC" = "yes" ]; then
              echo "COCOA_LFLAGS =-framework Foundation -framework CoreServices" >>"$mkfile"
              echo "CARBON_LFLAGS =-framework ApplicationServices" >>"$mkfile"
-@@ -4089,6 +4125,7 @@ if true; then ###[ '!' -f "$outpath/bin/qmake" ];
+@@ -4110,6 +4145,7 @@ if true; then ###[ '!' -f "$outpath/bin/qmake" ];
          if [ '!' -z "$D_FLAGS" ]; then
              EXTRA_CFLAGS="$EXTRA_CFLAGS $D_FLAGS"
          fi
@@ -269,7 +270,7 @@ index d923bbb..175eb02 100755
          echo >>"$mkfile"
  	adjrelpath=`echo "$relpath" | sed 's/ /\\\\\\\\ /g'`
  	adjoutpath=`echo "$outpath" | sed 's/ /\\\\\\\\ /g'`
-@@ -4178,7 +4215,81 @@ QTCONFFILE="$outpath/bin/qt.conf"
+@@ -4179,7 +4215,81 @@ QTCONFFILE="$outpath/bin/qt.conf"
  cat > "$QTCONFFILE" <<EOF
  [EffectivePaths]
  Prefix=..
@@ -291,7 +292,7 @@ index d923bbb..175eb02 100755
 +if [ -n "$QT_INSTALL_LIBS" ]; then
 +cat >> "$QTCONFFILE" <<EOF
 +Libraries=$QT_INSTALL_LIBS
- EOF
++EOF
 +fi
 +if [ -n "$QT_INSTALL_DOCS" ]; then
 +cat >> "$QTCONFFILE" <<EOF
@@ -326,7 +327,7 @@ index d923bbb..175eb02 100755
 +if [ -n "$QT_INSTALL_DATA" ]; then
 +cat >> "$QTCONFFILE" <<EOF
 +Data=$QT_INSTALL_DATA
-+EOF
+ EOF
 +fi
 +if [ -n "$QT_HOST_PREFIX" ]; then
 +cat >> "$QTCONFFILE" <<EOF
@@ -351,7 +352,7 @@ index d923bbb..175eb02 100755
  if [ x"$relpath" != x"$outpath" ]; then
      cat >> "$QTCONFFILE" <<EOF
  [EffectiveSourcePaths]
-@@ -4186,6 +4297,9 @@ Prefix=$relpath
+@@ -4187,6 +4297,9 @@ Prefix=$relpath
  EOF
  fi
  
@@ -361,7 +362,7 @@ index d923bbb..175eb02 100755
  #-------------------------------------------------------------------------------
  # write out device config before we run the test.
  #-------------------------------------------------------------------------------
-@@ -4198,9 +4312,20 @@ else
+@@ -4199,9 +4312,20 @@ else
  fi
  
  #-------------------------------------------------------------------------------
@@ -383,7 +384,7 @@ index d923bbb..175eb02 100755
  if [ $? != "0" ]; then
      echo "Failed to process makespec for platform '$XPLATFORM'"
      if [ "$OPT_VERBOSE" = "yes" ]; then
-@@ -4216,7 +4341,7 @@ fi
+@@ -4217,7 +4341,7 @@ fi
  #-------------------------------------------------------------------------------
  if [ -z "$PKG_CONFIG" ]; then
      # See if PKG_CONFIG is set in the mkspec:
@@ -392,7 +393,7 @@ index d923bbb..175eb02 100755
      [ -n "$PKG_CONFIG" ] && [ "$OPT_VERBOSE" = "yes" ] && echo "Found pkg-config from mkspec: $PKG_CONFIG"
  fi
  if [ -z "$PKG_CONFIG" ]; then
-@@ -4291,7 +4416,7 @@ compileTest()
+@@ -4292,7 +4416,7 @@ compileTest()
      if [ "$CFG_SHARED" = "no" ]; then
          test_config="$QMAKE_CONFIG static"
      fi
@@ -401,7 +402,7 @@ index d923bbb..175eb02 100755
  }
  
  compileTestWithPkgConfig()
-@@ -4340,7 +4465,7 @@ compileTestWithPkgConfig()
+@@ -4341,7 +4465,7 @@ compileTestWithPkgConfig()
  
  # Use config.tests/arch/arch.pro to have the compiler tell us what the target architecture is
  OUTFILE=$outpath/arch.result
@@ -410,7 +411,7 @@ index d923bbb..175eb02 100755
  if [ $? -eq 0 ]; then
      eval `cat "$OUTFILE"`
  else
-@@ -4353,7 +4478,7 @@ rm -f "$OUTFILE" 2>/dev/null
+@@ -4354,7 +4478,7 @@ rm -f "$OUTFILE" 2>/dev/null
  
  if [ "$QMAKESPEC" != "$XQMAKESPEC" ]; then
      # Do the same test again, using the host compiler
@@ -419,7 +420,7 @@ index d923bbb..175eb02 100755
      if [ $? -eq 0 ]; then
          eval `cat "$OUTFILE"`
      else
-@@ -4569,7 +4694,7 @@ fi
+@@ -4570,7 +4694,7 @@ fi
  
  # detect mips_dsp support
  if [ "$CFG_ARCH" = "mips" ] && [ "${CFG_MIPS_DSP}" = "auto" ]; then
@@ -428,7 +429,7 @@ index d923bbb..175eb02 100755
          CFG_MIPS_DSP=yes
      else
          CFG_MIPS_DSP=no
-@@ -4580,7 +4705,7 @@ fi
+@@ -4581,7 +4705,7 @@ fi
  
  # detect mips_dspr2 support
  if [ "$CFG_ARCH" = "mips" ] && [ "${CFG_MIPS_DSPR2}" = "auto" ]; then
@@ -437,7 +438,7 @@ index d923bbb..175eb02 100755
          CFG_MIPS_DSPR2=yes
      else
          CFG_MIPS_DSPR2=no
-@@ -7467,7 +7592,7 @@ rm -f "$QMAKE_VARS_FILE" 2>/dev/null
+@@ -7471,7 +7595,7 @@ rm -f "$QMAKE_VARS_FILE" 2>/dev/null
          cd ..
      fi
  
@@ -475,10 +476,10 @@ index e0383ef..9281d3e 100644
  # Provide a function to be used by mkspecs
  defineTest(deviceSanityCheckCompiler) {
 diff --git a/mkspecs/features/qt_functions.prf b/mkspecs/features/qt_functions.prf
-index b2c2507..c16005f 100644
+index 8639695..e250959 100644
 --- a/mkspecs/features/qt_functions.prf
 +++ b/mkspecs/features/qt_functions.prf
-@@ -57,7 +57,7 @@ defineTest(qtHaveModule) {
+@@ -70,7 +70,7 @@ defineTest(qtHaveModule) {
  defineTest(qtPrepareTool) {
      cmd = $$eval(QT_TOOL.$${2}.binary)
      isEmpty(cmd) {

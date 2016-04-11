@@ -23,4 +23,4 @@ do_configure_prepend() {
     sed -i 's#^qtHaveModule(webkitwidgets):#enable-webkit:qtHaveModule(webkitwidgets):#g' ${S}/src/imports/imports.pro
 }
 
-SRCREV = "87f2415adf34da08e6cd58f5da6f6a7d0d9cf141"
+SRCREV = "bf4efac4ed2f3b1ff11fd1361506dec3c2a8726c"

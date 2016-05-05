@@ -1,4 +1,4 @@
-From b0e46ec8b5f3a220a1660677c87cefa5fc3a7fc9 Mon Sep 17 00:00:00 2001
+From eb70e52aa796576daa73027c93f2fba77861e4e2 Mon Sep 17 00:00:00 2001
 From: David Schulz <david.schulz@theqtcompany.com>
 Date: Mon, 12 Oct 2015 09:55:30 +0200
 Subject: [PATCH] configure: Separate host and build platform.
@@ -14,7 +14,7 @@ runs on the build system.
 Change-Id: Ifd83a4c6376d3299647e74bb349a3452a6f433fc
 ---
  config.tests/unix/arch.test        |   6 +-
- config.tests/unix/compile.test     |   6 +-
+ config.tests/unix/compile.test     |   7 +-
  configure                          | 164 ++++++++++++++++++++++++++++++++-----
  mkspecs/features/device_config.prf |  15 ++--
  mkspecs/features/qt_functions.prf  |   2 +-
@@ -22,7 +22,7 @@ Change-Id: Ifd83a4c6376d3299647e74bb349a3452a6f433fc
  qmake/qmake-aux.pro                |  11 +++
  qmake/qmake-docs.pro               |   2 -
  qtbase.pro                         |  15 +---
- 9 files changed, 210 insertions(+), 68 deletions(-)
+ 9 files changed, 211 insertions(+), 68 deletions(-)
  create mode 100644 qmake/qmake-aux.pro
  delete mode 100644 qmake/qmake-docs.pro
 
@@ -51,7 +51,7 @@ index c50bd8b..cfb47de 100755
  
  ARCH=""
 diff --git a/config.tests/unix/compile.test b/config.tests/unix/compile.test
-index 65bc874..45c365c 100755
+index 598e2a2..b33b74c 100755
 --- a/config.tests/unix/compile.test
 +++ b/config.tests/unix/compile.test
 @@ -10,7 +10,9 @@ OUTDIR=$5
@@ -64,18 +64,19 @@ index 65bc874..45c365c 100755
 +shift 9
  LFLAGS="$SYSROOT_FLAG"
  INCLUDEPATH=""
- CXXFLAGS="$SYSROOT_FLAG"
-@@ -67,7 +69,7 @@ test -r Makefile && $MAKE distclean >/dev/null 2>&1
- # Make sure output from possible previous tests is gone
+ CFLAGS="$SYSROOT_FLAG"
+@@ -73,7 +75,8 @@ test -r Makefile && $MAKE distclean >/dev/null 2>&1
  rm -f "$EXE" "${EXE}.exe"
  
--set -- "$OUTDIR/bin/qmake" -nocache -spec "$QMKSPEC" "CONFIG+=$QMAKE_CONFIG" "CONFIG+=android_app" "CONFIG-=debug_and_release app_bundle lib_bundle" "LIBS+=$LFLAGS" "LIBS+=$MAC_ARCH_LFLAGS" "INCLUDEPATH*=$INCLUDEPATH" "QMAKE_CXXFLAGS*=$CXXFLAGS" "QMAKE_CXXFLAGS+=$MAC_ARCH_CXXFLAGS" "$SRCDIR/$TEST/$EXE.pro" -o "$OUTDIR/$TEST/Makefile"
-+set -- "$QMAKE" -qtconf "$QTCONF" -nocache -spec "$QMKSPEC" "CONFIG+=$QMAKE_CONFIG" "CONFIG+=android_app" "CONFIG-=debug_and_release app_bundle lib_bundle" "LIBS+=$LFLAGS" "LIBS+=$MAC_ARCH_LFLAGS" "INCLUDEPATH*=$INCLUDEPATH" "QMAKE_CXXFLAGS*=$CXXFLAGS" "QMAKE_CXXFLAGS+=$MAC_ARCH_CXXFLAGS" "$SRCDIR/$TEST/$EXE.pro" -o "$OUTDIR/$TEST/Makefile"
- if [ "$VERBOSE" = "yes" ]; then
-     OUTDIR=$OUTDIR "$@" && $MAKE && SUCCESS=yes
- else
+ set -- \
+-    "$OUTDIR/bin/qmake" \
++    "$QMAKE" \
++     -qtconf "$QTCONF" \
+      -nocache \
+      -spec "$QMKSPEC" \
+      "CONFIG+=$QMAKE_CONFIG" \
 diff --git a/configure b/configure
-index 42e49c5..a244acb 100755
+index f833869..0d5cae0 100755
 --- a/configure
 +++ b/configure
 @@ -104,9 +104,11 @@ QT_CONFIG=

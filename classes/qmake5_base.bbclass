@@ -44,7 +44,7 @@ OE_QMAKE_WAYLAND_SCANNER = "${STAGING_BINDIR_NATIVE}/wayland-scanner"
 OE_QMAKE_QTCONF_PATH = "${WORKDIR}/qt.conf"
 OE_QMAKE_QTCONF = "-qtconf ${OE_QMAKE_QTCONF_PATH}"
 
-inherit qmake5_paths
+inherit qmake5_paths remove-libtool
 
 do_generate_qt_config_file() {
     generate_qt_config_file_paths
@@ -196,7 +196,6 @@ qmake5_base_do_install() {
     find . -name "Makefile*" | xargs -r sed -i "s,(INSTALL_ROOT)${STAGING_DIR_NATIVE},(INSTALL_ROOT),g"
 
     oe_runmake install INSTALL_ROOT=${D}
-    find "${D}" -ignore_readdir_race -name "*.la" -delete
 
     # everything except HostData and HostBinaries is prefixed with sysroot value,
     # but we cannot remove sysroot override, because that's useful for pkg-config etc

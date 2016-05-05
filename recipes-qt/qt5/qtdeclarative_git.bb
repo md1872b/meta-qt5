@@ -15,6 +15,7 @@ DEPENDS += "qtbase"
 
 SRC_URI += " \
     file://0001-qmltestexample-fix-link.patch \
+    file://0002-qquickviewcomparison-fix-QCoreApplication-has-not-be.patch \
 "
 
 EXTRA_OEMAKE += "QMAKE_SYNCQT=${STAGING_BINDIR_NATIVE}${QT_DIR_NAME}/syncqt"
@@ -36,8 +37,8 @@ do_install_append_class-nativesdk() {
     rm -rf ${D}${OE_QMAKE_PATH_QML}
 }
 
-EXTRA_QMAKEVARS_PRE += "${@base_contains('PACKAGECONFIG', 'qtxmlpatterns', 'CONFIG+=OE_QTXMLPATTERNS_ENABLED', '', d)}"
+EXTRA_QMAKEVARS_PRE += "${@bb.utils.contains('PACKAGECONFIG', 'qtxmlpatterns', 'CONFIG+=OE_QTXMLPATTERNS_ENABLED', '', d)}"
 
-SRCREV = "d438b4f4b93d04a841edf031359e26af617d889d"
+SRCREV = "26ff8f9029107877bfbfdc2f099f9b11861183ed"
 
 BBCLASSEXTEND =+ "native nativesdk"

@@ -81,7 +81,7 @@ QT_CONFIG_FLAGS += " \
     -no-pch \
     -no-rpath \
     -pkg-config \
-    ${EXTRA_OECONF} \
+    ${PACKAGECONFIG_CONFARGS} \
 "
 
 # qtbase is exception, as these are used as install path for sysroots
@@ -190,7 +190,7 @@ do_configure() {
         -xplatform ${OE_QMAKE_PLATFORM} \
         ${QT_CONFIG_FLAGS}
 
-    ${OE_QMAKE_QMAKE} ${OE_QMAKE_DEBUG_OUTPUT} ${OE_QMAKE_QTCONF} ${S} -o Makefile || die "Configuring qt with qmake failed. EXTRA_OECONF was ${EXTRA_OECONF}"
+    ${OE_QMAKE_QMAKE} ${OE_QMAKE_DEBUG_OUTPUT} ${OE_QMAKE_QTCONF} ${S} -o Makefile || die "Configuring qt with qmake failed. PACKAGECONFIG_CONFARGS was ${PACKAGECONFIG_CONFARGS}"
 }
 
 do_install() {
@@ -239,4 +239,4 @@ fakeroot do_generate_qt_environment_file() {
 
 addtask generate_qt_environment_file after do_install before do_package
 
-SRCREV = "8ce657d0279566ef327af1b88339534041ddc012"
+SRCREV = "cec15a89d058424794978910cc8da65b43d71606"

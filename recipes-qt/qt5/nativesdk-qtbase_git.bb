@@ -150,7 +150,6 @@ do_configure() {
         -no-gif \
         -no-accessibility \
         -no-cups \
-        -no-nis \
         -no-gui \
         -no-qml-debug \
         -no-sql-mysql \
@@ -239,4 +238,4 @@ fakeroot do_generate_qt_environment_file() {
 
 addtask generate_qt_environment_file after do_install before do_package
 
-SRCREV = "cec15a89d058424794978910cc8da65b43d71606"
+SRCREV = "6bcd27b957a5ffcfe7665b0979679510e3b2ae3d"

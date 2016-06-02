@@ -45,7 +45,6 @@ PACKAGECONFIG_CONFARGS = " \
     -no-gif \
     -no-accessibility \
     -no-cups \
-    -no-nis \
     -no-gui \
     -no-qml-debug \
     -no-sql-mysql \
@@ -115,4 +114,4 @@ do_install() {
     ln -sf syncqt.pl ${D}${OE_QMAKE_PATH_QT_BINS}/syncqt
 }
 
-SRCREV = "cec15a89d058424794978910cc8da65b43d71606"
+SRCREV = "6bcd27b957a5ffcfe7665b0979679510e3b2ae3d"

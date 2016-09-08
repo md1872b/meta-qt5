@@ -1,4 +1,4 @@
-From 6b92250b1e3268c888319f76ca4cf6d9eee71b54 Mon Sep 17 00:00:00 2001
+From d98f945aade15bf49eb7c016d2eefd513351b360 Mon Sep 17 00:00:00 2001
 From: David Schulz <david.schulz@theqtcompany.com>
 Date: Mon, 12 Oct 2015 09:55:30 +0200
 Subject: [PATCH] configure: Separate host and build platform.
@@ -51,7 +51,7 @@ index c50bd8b..cfb47de 100755
  
  ARCH=""
 diff --git a/config.tests/unix/compile.test b/config.tests/unix/compile.test
-index 69d4285..17e4154 100755
+index bc5258c..f5db184 100755
 --- a/config.tests/unix/compile.test
 +++ b/config.tests/unix/compile.test
 @@ -10,7 +10,9 @@ OUTDIR=$5
@@ -65,7 +65,7 @@ index 69d4285..17e4154 100755
  LFLAGS="$SYSROOT_FLAG"
  INCLUDEPATH=""
  CFLAGS="$SYSROOT_FLAG"
-@@ -70,7 +72,8 @@ test -r Makefile && $MAKE distclean >/dev/null 2>&1
+@@ -73,7 +75,8 @@ test -r Makefile && $MAKE distclean >/dev/null 2>&1
  rm -f "$EXE" "${EXE}.exe"
  
  set -- \
@@ -76,7 +76,7 @@ index 69d4285..17e4154 100755
       -spec "$QMKSPEC" \
       "CONFIG+=$QMAKE_CONFIG" \
 diff --git a/configure b/configure
-index 2da6a78..85123e9 100755
+index 55b1886..ef9c29b 100755
 --- a/configure
 +++ b/configure
 @@ -105,9 +105,11 @@ QT_CONFIG=
@@ -394,16 +394,16 @@ index 2da6a78..85123e9 100755
      [ -n "$PKG_CONFIG" ] && [ "$OPT_VERBOSE" = "yes" ] && echo "Found pkg-config from mkspec: $PKG_CONFIG"
  fi
  if [ -z "$PKG_CONFIG" ]; then
-@@ -4313,7 +4437,7 @@ compileTest()
-         test_config="$QMAKE_CONFIG static"
+@@ -4317,7 +4441,7 @@ compileTest()
+         TEST_CONFIG_FLAGS="QT_CONFIG+=no-pkg-config"
      fi
      echo $ECHO_N "checking for $name... $ECHO_C"
--    "$unixtests/compile.test" "$XQMAKESPEC" "$test_config" $OPT_VERBOSE "$relpath" "$outpath" "$path" "$name" $I_FLAGS $D_FLAGS $L_FLAGS "$@"
-+    "$unixtests/compile.test" "$XQMAKESPEC" "$test_config" $OPT_VERBOSE "$relpath" "$outpath" "$path" "$name" "$CFG_QMAKE_PATH" "$QTCONFFILE" $I_FLAGS $D_FLAGS $L_FLAGS "$@"
+-    "$unixtests/compile.test" "$XQMAKESPEC" "$test_config" $OPT_VERBOSE "$relpath" "$outpath" "$path" "$name" $I_FLAGS $D_FLAGS $L_FLAGS $TEST_CONFIG_FLAGS "$@"
++    "$unixtests/compile.test" "$XQMAKESPEC" "$test_config" $OPT_VERBOSE "$relpath" "$outpath" "$path" "$name" "$CFG_QMAKE_PATH" "$QTCONFFILE" $I_FLAGS $D_FLAGS $L_FLAGS $TEST_CONFIG_FLAGS "$@"
  }
  
  compileTestWithPkgConfig()
-@@ -4362,7 +4486,7 @@ compileTestWithPkgConfig()
+@@ -4366,7 +4490,7 @@ compileTestWithPkgConfig()
  
  # Use config.tests/arch/arch.pro to have the compiler tell us what the target architecture is
  OUTFILE=$outpath/arch.result
@@ -412,7 +412,7 @@ index 2da6a78..85123e9 100755
  if [ $? -eq 0 ]; then
      eval `cat "$OUTFILE"`
  else
-@@ -4375,7 +4499,7 @@ rm -f "$OUTFILE" 2>/dev/null
+@@ -4379,7 +4503,7 @@ rm -f "$OUTFILE" 2>/dev/null
  
  if [ "$QMAKESPEC" != "$XQMAKESPEC" ]; then
      # Do the same test again, using the host compiler
@@ -421,7 +421,7 @@ index 2da6a78..85123e9 100755
      if [ $? -eq 0 ]; then
          eval `cat "$OUTFILE"`
      else
-@@ -4591,7 +4715,7 @@ fi
+@@ -4595,7 +4719,7 @@ fi
  
  # detect mips_dsp support
  if [ "$CFG_ARCH" = "mips" ] && [ "${CFG_MIPS_DSP}" = "auto" ]; then
@@ -430,7 +430,7 @@ index 2da6a78..85123e9 100755
          CFG_MIPS_DSP=yes
      else
          CFG_MIPS_DSP=no
-@@ -4602,7 +4726,7 @@ fi
+@@ -4606,7 +4730,7 @@ fi
  
  # detect mips_dspr2 support
  if [ "$CFG_ARCH" = "mips" ] && [ "${CFG_MIPS_DSPR2}" = "auto" ]; then
@@ -439,7 +439,7 @@ index 2da6a78..85123e9 100755
          CFG_MIPS_DSPR2=yes
      else
          CFG_MIPS_DSPR2=no
-@@ -7495,7 +7619,7 @@ rm -f "$QMAKE_VARS_FILE" 2>/dev/null
+@@ -7500,7 +7624,7 @@ rm -f "$QMAKE_VARS_FILE" 2>/dev/null
          cd ..
      fi
  
@@ -640,6 +640,3 @@ index 98ca86a..11cff9e 100644
      $$files($$PWD/mkspecs/*)
  mkspecs.files -= $$PWD/mkspecs/modules $$PWD/mkspecs/modules-inst
  INSTALLS += mkspecs
--- 
-1.9.1
-

@@ -251,4 +251,4 @@ sysroot_stage_dirs_append() {
     rm -rf $to${OE_QMAKE_PATH_QT_FONTS}
 }
 
-SRCREV = "c8a6b4278b04ff3ffb4484a3cf17cf4638dbadb4"
+SRCREV = "b4ada3f0d8feed7dbff22aa780d38ab126020ac6"

@@ -38,4 +38,4 @@ SRC_URI += "\
     file://0001-Initial-porting-effort-to-GStreamer-1.0.patch \
 "
 
-SRCREV = "1be4f74843b41f8bc1d1d64e83485f4eb864e8b4"
+SRCREV = "c954fe7f171c0602cdb555ef10618769991513b6"

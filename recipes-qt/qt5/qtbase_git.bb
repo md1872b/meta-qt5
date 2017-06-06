@@ -193,6 +193,9 @@ do_configure() {
 }
 
 do_install_append() {
+    # Avoid qmake error "Cannot read [...]/usr/lib/qt5/mkspecs/oe-device-extra.pri: No such file or directory"
+    touch ${D}/${OE_QMAKE_PATH_QT_ARCHDATA}/mkspecs/oe-device-extra.pri
+
     ### Fix up the binaries to the right location
     ### TODO: FIX
     # install fonts manually if they are missing

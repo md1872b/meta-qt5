@@ -1,4 +1,4 @@
-From d98f945aade15bf49eb7c016d2eefd513351b360 Mon Sep 17 00:00:00 2001
+From cb1e143a42e41524f16043c92b728dfae54586f9 Mon Sep 17 00:00:00 2001
 From: David Schulz <david.schulz@theqtcompany.com>
 Date: Mon, 12 Oct 2015 09:55:30 +0200
 Subject: [PATCH] configure: Separate host and build platform.
@@ -76,7 +76,7 @@ index bc5258c..f5db184 100755
       -spec "$QMKSPEC" \
       "CONFIG+=$QMAKE_CONFIG" \
 diff --git a/configure b/configure
-index 55b1886..ef9c29b 100755
+index 2073880..79eabe0 100755
 --- a/configure
 +++ b/configure
 @@ -105,9 +105,11 @@ QT_CONFIG=
@@ -594,15 +594,15 @@ index 3123f7c..0000000
 -TEMPLATE = aux
 -QMAKE_DOCS = $$PWD/doc/qmake.qdocconf
 diff --git a/qtbase.pro b/qtbase.pro
-index 98ca86a..11cff9e 100644
+index 78f9b3a..88ff2de 100644
 --- a/qtbase.pro
 +++ b/qtbase.pro
 @@ -4,7 +4,7 @@
  
  load(qt_parts)
  
--SUBDIRS += qmake/qmake-docs.pro
-+SUBDIRS += qmake/qmake-aux.pro
+-SUBDIRS += qmake/qmake-docs.pro doc
++SUBDIRS += qmake/qmake-aux.pro doc
  
  cross_compile: CONFIG += nostrip
  

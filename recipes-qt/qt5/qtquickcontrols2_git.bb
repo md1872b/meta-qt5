@@ -12,4 +12,4 @@ DEPENDS += "qtdeclarative"
 
 FILES_${PN}-qmlplugins += "${libdir}/qt5/qml/Qt"
 
-SRCREV = "e93c73c0aa15cd973e008a04a70a7c69719ad244"
+SRCREV = "be77d8798a1df1cb928b944c145db3fa9aeb9777"

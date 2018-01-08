@@ -37,7 +37,7 @@ PACKAGECONFIG[libhybris-egl-server] = "-feature-libhybris-egl-server,-no-feature
 
 EXTRA_QMAKEVARS_CONFIGURE += "${PACKAGECONFIG_CONFARGS}"
 
-SRCREV = "154bdf45dd51a521058c820e7b871008ce8508ae"
+SRCREV = "70fc4900ee70e786b615e1f31201564b946fd0ac"
 
 BBCLASSEXTEND =+ "native nativesdk"
 

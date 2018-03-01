@@ -29,7 +29,7 @@ SRC_URI += " \
     ${QT_GIT}/qtlocation-mapboxgl.git;name=qtlocation-mapboxgl;branch=upstream/qt-staging;protocol=${QT_GIT_PROTOCOL};destsuffix=git/src/3rdparty/mapbox-gl-native \
 "
 
-SRCREV_qtlocation = "a34e08740d55b606bbaa4963a3ba9887459fd8ce"
-SRCREV_qtlocation-mapboxgl = "8c1be4ec01ef46bf453856531ebf53b48ce3dbe7"
+SRCREV_qtlocation = "cc3a5a926db8d07c8282407a7b010b4ab2289592"
+SRCREV_qtlocation-mapboxgl = "572822c8ca15be190b43afbf7f91d132e988bf21"
 
 SRCREV_FORMAT = "qtlocation_qtlocation-mapboxgl"

@@ -53,4 +53,4 @@ FILES_${PN} += "${OE_QMAKE_PATH_DATA}/qtvirtualkeyboard/lipi_toolkit"
 
 DEPENDS += "qtbase qtdeclarative qtmultimedia qtquickcontrols qtsvg qtxmlpatterns"
 
-SRCREV = "e078c5e237142270f5d85a22a1e8adc969668695"
+SRCREV = "1838b75f6c21d71e7bd88b03e44c07287879a4e8"

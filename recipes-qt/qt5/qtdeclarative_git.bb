@@ -30,6 +30,6 @@ do_install_append_class-nativesdk() {
 
 EXTRA_QMAKEVARS_PRE += "${@bb.utils.contains('PACKAGECONFIG', 'qtxmlpatterns', 'CONFIG+=OE_QTXMLPATTERNS_ENABLED', '', d)}"
 
-SRCREV = "283a900c4e8518fef33a2c89cb597fbf1e6ad78c"
+SRCREV = "b067e607f1cfd5bee94710d6a6a7c2fa048e9b23"
 
 BBCLASSEXTEND =+ "native nativesdk"

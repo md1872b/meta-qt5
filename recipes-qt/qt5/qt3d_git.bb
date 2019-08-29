@@ -36,6 +36,6 @@ do_configure_prepend() {
          ${S}/src/quick3d/imports/input/importsinput.pro
 }
 
-SRCREV = "6388eb98a12a639a263ef34553269fc36b582269"
+SRCREV = "29541954dc1ab128295487f25067876d9967b2f9"
 
 BBCLASSEXTEND += "native nativesdk"

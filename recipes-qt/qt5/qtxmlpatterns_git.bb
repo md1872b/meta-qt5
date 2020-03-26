@@ -25,7 +25,7 @@ do_configure_prepend() {
 
 EXTRA_QMAKEVARS_PRE += "${@bb.utils.contains('PACKAGECONFIG', 'qtdeclarative', 'CONFIG+=OE_QTDECLARATIVE_ENABLED', '', d)}"
 
-SRCREV = "dcb5ff3b42c5a9fc11414d43832f320910f9d908"
+SRCREV = "9a88ab0974c7beaadacc1865f53ea526049c6227"
 
 BBCLASSEXTEND =+ "native nativesdk"
 

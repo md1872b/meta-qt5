@@ -32,13 +32,12 @@ EXTRA_QMAKEVARS_PRE += " \
     ${@bb.utils.contains('PACKAGECONFIG', 'qtwebkit', '', 'CONFIG+=noqtwebkit', d)} \
 "
 
-SRCREV = "90aa88f31bba9521c1a6f0b242f97ebdc2285cee"
+SRCREV = "6d15540d6fdc3a45526a780e4a836c921493c19c"
 
 BBCLASSEXTEND = "native nativesdk"
 
 do_install_ptest() {
     mkdir -p ${D}${PTEST_PATH}
     t=${D}${PTEST_PATH}
-    cp ${B}/tests/auto/qtdiag/tst_tdiag $t
     cp ${B}/tests/auto/qtattributionsscanner/tst_qtattributionsscanner $t
 }

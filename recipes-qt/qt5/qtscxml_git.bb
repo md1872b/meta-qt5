@@ -10,7 +10,7 @@ require qt5-git.inc
 
 DEPENDS += "qtbase qtdeclarative qtxmlpatterns qtscxml-native"
 
-SRCREV = "206a812b21d9ade4a9319256ff5fce6930f18e27"
+SRCREV = "878112bf670bb9f9caa09de290c63b0f9078d3f0"
 
 # Patches from https://github.com/meta-qt5/qtscxml/commits/b5.12
 # 5.12.meta-qt5.2

@@ -18,6 +18,8 @@ SRC_URI += " \
     file://0001-Use-OE_QMAKE_PATH_EXTERNAL_HOST_BINS-to-locate-qmlca.patch \
 "
 
+LDFLAGS_append_riscv64 = " -pthread"
+
 DEPENDS += "qtbase qtdeclarative-native"
 
 PACKAGECONFIG ??= "qml-debug qml-network ${@bb.utils.contains('DISTRO_FEATURES', 'qt5-static', 'static', '', d)}"

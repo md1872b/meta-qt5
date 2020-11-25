@@ -17,6 +17,9 @@ SRC_URI += "\
     file://0003-Fix-build-bug-for-armv32-BE.patch \
     file://0004-PlatformQt.cmake-Do-not-generate-hardcoded-include-p.patch \
     file://0005-Riscv-Add-support-for-riscv.patch \
+    file://0006-Fix-build-with-bison37.patch \
+    file://0007-Disable-code-related-to-HTTP-2-when-Qt-is-configured.patch \
+    file://0008-Fix-compilation-with-Python-3.9-avoid-passing-encodi.patch \
 "
 
 inherit cmake_qt5 perlnative

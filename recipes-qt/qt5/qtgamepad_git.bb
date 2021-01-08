@@ -1,5 +1,5 @@
 require qt5.inc
-require qt5-git.inc
+require qt5-lts.inc
 
 LICENSE = "GPL-3.0 | LGPL-3.0 | The-Qt-Company-Commercial"
 LIC_FILES_CHKSUM = " \
@@ -14,4 +14,4 @@ PACKAGECONFIG[sdl2] = "-feature-sdl2,-no-feature-sdl2,libsdl2"
 
 EXTRA_QMAKEVARS_CONFIGURE += "${PACKAGECONFIG_CONFARGS}"
 
-SRCREV = "ff933a4e72826a77c81c4153f1adcf765ead35f0"
+SRCREV = "64afa18a0a1e9588060e2e6d917bb01ccdd48a81"

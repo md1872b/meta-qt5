@@ -1,5 +1,5 @@
 require qt5.inc
-require qt5-git.inc
+require qt5-lts.inc
 
 LICENSE = "GFDL-1.3 & (GPL-3 | LGPL-3.0) | The-Qt-Company-Commercial"
 LIC_FILES_CHKSUM = " \
@@ -11,4 +11,4 @@ LIC_FILES_CHKSUM = " \
 
 DEPENDS += "qtbase qtdeclarative"
 
-SRCREV = "f73735911b2124ef16aa39228bf8f89ee900ba5d"
+SRCREV = "e7883bc64440b1ff4666272ac6eb710ee4bc221b"

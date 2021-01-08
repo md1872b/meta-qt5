@@ -1,5 +1,5 @@
 require qt5.inc
-require qt5-git.inc
+require qt5-lts.inc
 
 LICENSE = "(GPL-3.0 & BSD) | The-Qt-Company-Commercial"
 LIC_FILES_CHKSUM = " \
@@ -21,7 +21,7 @@ FILES_${PN}-qmlplugins += " \
   ${OE_QMAKE_PATH_QML}/QtQuick3D/Helpers/meshes/*.mesh \
 "
 
-SRCREV_qtquick3d = "2e05e6d6546635a8f25882c5140fb17697be0062"
+SRCREV_qtquick3d = "68b30bb23e34426e7d6a4c243a42ae57dfe45c6b"
 SRCREV_assimp = "8f0c6b04b2257a520aaab38421b2e090204b69df"
 
 SRCREV_FORMAT = "qtquick3d_assimp"

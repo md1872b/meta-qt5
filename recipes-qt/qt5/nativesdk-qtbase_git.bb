@@ -16,7 +16,7 @@ LIC_FILES_CHKSUM = " \
 QT_MODULE = "qtbase"
 
 require nativesdk-qt5.inc
-require qt5-git.inc
+require qt5-lts.inc
 
 # it's already included with newer oe-core, but include it here for dylan
 FILESEXTRAPATHS =. "${FILE_DIRNAME}/qtbase:"
@@ -195,4 +195,4 @@ fakeroot do_generate_qt_environment_file() {
 do_generate_qt_environment_file[umask] = "022"
 addtask generate_qt_environment_file after do_install before do_package
 
-SRCREV = "40143c189b7c1bf3c2058b77d00ea5c4e3be8b28"
+SRCREV = "ffa0ecdc5d507754ddd962e2edbc859c198b2700"

@@ -1,5 +1,5 @@
 require qt5.inc
-require qt5-git.inc
+require qt5-lts.inc
 
 DEPENDS += "qtbase qtdeclarative wayland wayland-native qtwayland-native"
 DEPENDS_append_class-target = " libxkbcommon"
@@ -43,7 +43,7 @@ PACKAGECONFIG[wayland-vulkan-server-buffer] = "-feature-wayland-vulkan-server-bu
 
 EXTRA_QMAKEVARS_CONFIGURE += "${PACKAGECONFIG_CONFARGS}"
 
-SRCREV = "3cc17177b1b03053276eb6236fda137c588261a7"
+SRCREV = "a8d35b3c18bdb05a0da3ed50a554a7b7bd4ebed3"
 
 BBCLASSEXTEND =+ "native nativesdk"
 

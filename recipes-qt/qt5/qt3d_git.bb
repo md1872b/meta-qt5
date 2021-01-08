@@ -1,5 +1,5 @@
 require qt5.inc
-require qt5-git.inc
+require qt5-lts.inc
 
 LICENSE = "LGPL-3.0 | GPL-2.0 | The-Qt-Company-Commercial"
 LIC_FILES_CHKSUM = " \
@@ -36,6 +36,6 @@ do_configure_prepend() {
          ${S}/src/quick3d/imports/input/importsinput.pro
 }
 
-SRCREV = "34171b1d99f55fde1627df3c57eed50480ab2ae7"
+SRCREV = "3b8ef584594048514645bc818ab5dd43cf882fe1"
 
 BBCLASSEXTEND += "native nativesdk"

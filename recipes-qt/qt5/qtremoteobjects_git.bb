@@ -25,6 +25,6 @@ PACKAGECONFIG[tools-only] = "CONFIG+=tools-only"
 
 EXTRA_QMAKEVARS_PRE += "${PACKAGECONFIG_CONFARGS}"
 
-SRCREV = "4d6d1e35fb8e0cb900b5e5e9266edea51dc4f735"
+SRCREV = "baccb040a4843d657c68dd7c0399aadcc6160ddc"
 
 BBCLASSEXTEND += "native nativesdk"
